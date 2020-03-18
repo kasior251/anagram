@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: "Anagram"
+route:
+  name: "${HOSTNAME:localhost}:${server.port}"

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Anagram Landingsside</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+    <script type="text/javascript">
+        function getAnagrams() {
+            var rest = new XMLHttpRequest();
+            var url = window.location.href + "anagrams";
+            rest.open("GET", url);
+            rest.onload = function() {
+                clearTable();
+                var table = document.getElementById("anagrams");
+                var response = this.response;
+                if (response == null || response.length == 0) {
+                    alert("Something went wrong. Please try again later");
+                    return;
+                }
+                var data = JSON.parse(response);
+                var j = 0;
+                data.forEach(entry => {
+                    var newRow = table.insertRow(j);
+
+                    var headerCell = document.createElement('th');
+                    headerCell.innerHTML = "Anagram(er) til " + entry["theWord"] + " er:";
+                    newRow.appendChild(headerCell)
+                    for(var i = 0; i < entry["theAnagrams"].length; i++) {
+                        var cell2 = newRow.insertCell(i+1);
+                        cell2.innerHTML = entry["theAnagrams"][i];
+                    }
+                });
+
+            }
+            rest.send();
+        }
+        function clearTable() {
+            var table = document.getElementById('anagrams');
+            while(table.hasChildNodes()) {
+                table.removeChild(table.firstChild);
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Anagrams finder by Kate Zubowicz</h1>
+<div id="buttonContainer">
+<button id="green" onclick="getAnagrams()">Find</button>
+<button id="red" onclick="clearTable()">Reset</button>
+</div>
+<div>
+<table id="anagrams"></table>
+</div>
+</body>
+</html>
