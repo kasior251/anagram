@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 public class AnagramController {
@@ -18,6 +23,8 @@ public class AnagramController {
         List<String> list;
         try {
             list = this.readFile();
+            List<Set<String>> secondList = this.readFile2();
+            System.out.println(secondList);
         }
         catch (IOException e) {
             return null;
@@ -57,5 +64,26 @@ public class AnagramController {
         }
         return aList;
     }
+
+    private static String sortLetters(String s) {
+        return Stream.of(s.split("")).sorted().collect(Collectors.joining());
+    }
+
+    private List<Set<String>> readFile2() throws IOException {
+        long start = System.currentTimeMillis();
+        try (InputStream file = this.getClass().getClassLoader().getResourceAsStream(FILE)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(file));
+            Stream<String> lines =  reader.lines();
+
+            Collector<String, ?, Map<String, Set<String>>> collector = Collectors.groupingBy(AnagramController::sortLetters, Collectors.toSet());
+            Map<String, Set<String>> anagrams = lines.collect(collector);
+
+            List<Set<String>> anagramList = anagrams.values().stream().filter(list -> list.size() > 1).collect(Collectors.toList());
+            System.out.println("It took " + (System.currentTimeMillis() - start) + " miliseconds to compute using Stream");
+            return anagramList;
+        }
+
+    }
+
 
 }
